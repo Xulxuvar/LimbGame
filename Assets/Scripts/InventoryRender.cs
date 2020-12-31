@@ -16,36 +16,35 @@ public class InventoryRender : MonoBehaviour
     [SerializeField] private Image background;
     [SerializeField] private Image itemTemplate;
 
-    //Part sprites is temporarilly stored here, until a better place is decided
-    [SerializeField] private Sprite[] partSprites;
+  
 
     // Start is called before the first frame update
     void Start()
     {
+        AbstractHeart testHeart = new TestHeart();
         inventoryGrid = new InventoryStruct();
-        inventoryGrid.setHeart();
-
- 
-
+        inventoryGrid.setHeart(testHeart);
         gridDims = inventoryGrid.getGridSize();
         resizeBackground(gridDims);
         GenerateEmpties();
-        addPartToGrid(0);
-        printInventoryGrid();
+        addHeartToGrid(testHeart);
+        //printInventoryGrid();
 
     }
 
-    //Adds the part to the grid, currently uses cringe shorts, should read the part later
-    private void addPartToGrid(short type)
+    private void addHeartToGrid(AbstractHeart heart)
     {
-        int[] offset;
-        switch (type){
-            case 0:
-                offset = inventoryGrid.getHeartOffset();
-                addPart(offset[0],offset[1],0);
-                break;
+        int[] offset = inventoryGrid.getHeartOffset(heart);
+            addPartToGrid(heart, offset);
+    }
 
-        }
+
+    //Adds the part to the grid, currently uses cringe shorts, should read the part later
+    private void addPartToGrid(AbstractPart part, int[] offset)
+    {
+       
+                addPart(offset[0],offset[1],part);
+      
     }
 
 
@@ -88,21 +87,21 @@ public class InventoryRender : MonoBehaviour
     }
 
     //This method will need revision for rotation later
-    private void addPart(int i, int j, int k)
+    private void addPart(int i, int j, AbstractPart part)
     {
-
-        bool[,] partSize = inventoryGrid.parsePartShape();
+    
+        bool[,] partSize = part.getPartGrid();
         float x = marginX + i * gridSize;
         float y = marginY + (gridDims[1] - partSize.GetLength(1) - j) * gridSize;
         Image empty = Instantiate(itemTemplate);
         InventoryPart emptyScript = empty.gameObject.GetComponent<InventoryPart>();
-        empty.sprite = partSprites[k];
+        empty.sprite = part.getSprite();
         empty.transform.SetParent(background.transform);
         emptyScript.setVisible();
         emptyScript.setPartSize(partSize.GetLength(0), partSize.GetLength(1));
         empty.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
 
-        inventoryGrid.addPart(new int[] { i, j },inventoryGrid.parsePartShape());
+        inventoryGrid.addPart(new int[] { i, j },part);
     }
 
 

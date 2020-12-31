@@ -14,38 +14,38 @@ public class InventoryStruct
     }
 
     //Pass in a heart for this method to create an empty inventory
-    public void setHeart()
+    public void setHeart(AbstractHeart heart)
     {
-        bool[,] gridShape = parseHeartDimensions();
+        bool[,] gridShape = heart.getHeartGrid();
 
         setInitialShape(gridShape);
     }
 
     //This method will add a heart to the grid
-    public int[] getHeartOffset()
+    public int[] getHeartOffset(AbstractHeart heart)
     {
         int[] gridSize = { inventoryGrid.GetLength(0), inventoryGrid.GetLength(1) };
 
-        //Replace this with fetching the dimensions of the heart itself
-        bool[,] tempHeartDims = parsePartShape();
+        bool[,] heartDims = heart.getPartGrid();
 
         int[] heartOffset =
         {
-            (gridSize[0]-tempHeartDims.GetLength(0))/2,
-            (gridSize[1]-tempHeartDims.GetLength(1))/2
+            (gridSize[0]-heartDims.GetLength(0))/2,
+            (gridSize[1]-heartDims.GetLength(1))/2
         };
 
         return heartOffset;
     }
     
     //Will need an item reference to run this method later
-    public void addPart(int[] offsets, bool[,] bools)
+    public void addPart(int[] offsets, AbstractPart part)
     {
         //Add a new item here
         //inventoryList.Add();
         //Temporary Appending to the list
         inventoryList.Add(0);
         int partIndex = inventoryList.Count - 1;
+        bool[,] bools = part.getPartGrid();
         int boundX = bools.GetLength(0);
         int boundY = bools.GetLength(1);
         for (int i = 0; i<boundX; i++)
@@ -56,21 +56,6 @@ public class InventoryStruct
                     inventoryGrid[i + offsets[0],j + offsets[1]] = (short)partIndex;
             }
         }
-    }
-
-    //This method will look at the heart provided grid
-    private bool[,] parseHeartDimensions()
-    {
-        bool[,] tempReturn = 
-            { {false, false, true, true, true, false,false },
-             { false,true, true,true, true, true,false },
-             { true,true, true,true, true, true,true },
-             { true,true, true,true, true, true,true },
-            { true,true, true,true, true, true,true },
-            { false,true, true,true, true, true,false },
-            { false,false, true, true, true, false,false } };
-        return tempReturn;
-
     }
 
     //This method will look at a parts shape, and return a boolean array

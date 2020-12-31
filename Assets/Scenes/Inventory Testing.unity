@@ -397,9 +397,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   background: {fileID: 695841452}
   itemTemplate: {fileID: 700565747}
-  partSprites:
-  - {fileID: 21300000, guid: c3005d04e07e0ab459d70a4ac8d6dfff, type: 3}
-  - {fileID: 21300000, guid: 92ad8a5b3c265bf488c10e1fd80f130c, type: 3}
 --- !u!4 &940595644
 Transform:
   m_ObjectHideFlags: 0
