@@ -22,6 +22,7 @@ public class TestHeart : AbstractHeart
     public TestHeart()
     :base(0,partGrid,heartGrid)
     {
-
+        partName = "Test Heart";
+        partDescription = "Temp Heart for debugging reasons";
     }
 }

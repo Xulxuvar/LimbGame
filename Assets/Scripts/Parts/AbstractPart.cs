@@ -12,6 +12,8 @@ public class AbstractPart : MonoBehaviour
         "Sprites/GridSprites/ArmLimbThing",
     };
 
+    public string partName = "AbstractPart";
+    public string partDescription = "You shouldn't be seeing this!\n ELDA TALUTA";
     private bool[,] gridShape;
     int spriteIndex;
 
