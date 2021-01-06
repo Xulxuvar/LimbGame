@@ -5,11 +5,42 @@ using UnityEngine;
 public class InventoryStruct
 {
     private short[,] inventoryGrid = new short[,] { { 1 } };
-    private List<short> inventoryList = new List<short>();
+    public List<InventoryPart> inventoryList = new List<InventoryPart>();
 
     // this is the constructor for inventory grid, idk what should be passed into it so far, probably a heart item
     public InventoryStruct()
     {
+
+    }
+
+    public bool checkValid(InventoryPart iPart, int[] origin)
+    {
+        int selectedIndex = -1;
+
+        for(int i = 0; i<inventoryList.Count; i++)
+            if(inventoryList[i] == iPart)
+            {
+                selectedIndex = i;
+                break;
+            }
+
+        bool[,] partShape = iPart.part.getPartGrid();
+
+        for(int i = 0; i<partShape.GetLength(1); i++)
+            for(int j = 0; j<partShape.GetLength(0); j++)
+            {
+                 if (i + origin[0] > inventoryGrid.GetLength(1) || j + origin[1] > inventoryGrid.GetLength(0) || i + origin[0] < 0 || j + origin[1] < 0)
+                   {
+                     Debug.Log("OOB " + i + origin[0] + " " + j + origin[1] + "\n");
+                         return false;
+                   }
+                if (partShape[j, i] && !(inventoryGrid[j + origin[1], i + origin[0]] == -2 || inventoryGrid[j + origin[1], i + origin[0]] == selectedIndex))
+                {
+                    Debug.Log(i + origin[0] + " " + j + origin[1] + "\n");
+                    return false;
+                }
+            }
+        return true;
 
     }
 
@@ -43,31 +74,24 @@ public class InventoryStruct
         //Add a new item here
         //inventoryList.Add();
         //Temporary Appending to the list
-        inventoryList.Add(0);
+       // inventoryList.Add(0);
+
         int partIndex = inventoryList.Count - 1;
         bool[,] bools = part.getPartGrid();
-        int boundX = bools.GetLength(0);
-        int boundY = bools.GetLength(1);
+        int boundX = bools.GetLength(1);
+        int boundY = bools.GetLength(0);
         for (int i = 0; i<boundX; i++)
         {
             for(int j = 0; j<boundY; j++)
             {
-                if (bools[i,j])
+                if (bools[j,i])
                     inventoryGrid[i + offsets[0],j + offsets[1]] = (short)partIndex;
             }
         }
     }
 
-    //This method will look at a parts shape, and return a boolean array
-    public bool[,] parsePartShape()
-    {
-        bool[,] tempReturn =
-           new bool[,] { { false, true, false }, { true, true, true }, { false, true, false } };
-        return tempReturn;
-    }
-
     //This method will be used to return the item information of a given grid tile
-    public short getGridItem(int i, int j)
+    public InventoryPart getGridItem(int i, int j)
     {
         int index = inventoryGrid[i, j];
         if(index>=0)
@@ -76,8 +100,30 @@ public class InventoryStruct
         }
         else
         {
+            return null;
+        }
+    }
+
+    public int getGridListIndex(int i, int j)
+    {
+        int index = inventoryGrid[i, j];
+        if (index >= 0)
+        {
+            return index;
+        }
+        else
+        {
             return -1;
         }
+    }
+
+    public void removeReferences(int index)
+    {
+        for (int i = 0; i < inventoryGrid.GetLength(1); i++)
+            for (int j = 0; j < inventoryGrid.GetLength(0); j++)
+                if (inventoryGrid[i, j] == index)
+                    inventoryGrid[i, j] = -1;
+                    
     }
 
     public short[,] getGrid()
