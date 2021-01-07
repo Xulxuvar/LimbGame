@@ -17,10 +17,25 @@ public class InventoryPart : MonoBehaviour
         
     }
 
+    public void rotateClockwise()
+    {
+        rotation += 1;
+        if (rotation > 3)
+            rotation = 0;
+        GetComponent<RectTransform>().Rotate(new Vector3(0, 0, -90));
+    }
+
+    public void rotateCClockwise()
+    {
+        rotation -= 1;
+        if (rotation < 0)
+            rotation = 3;
+        GetComponent<RectTransform>().Rotate(new Vector3(0, 0, 90));
+    }
     public void setRotation(int rot)
     {
         rotation = rot;
-        GetComponent<RectTransform>().Rotate(new Vector3(0, 0, rot * 90));
+        GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -rot * 90);
     }
 
     public bool[,] getPartGrid()
@@ -47,7 +62,7 @@ public class InventoryPart : MonoBehaviour
                 calc = new bool[baseline.GetLength(1), baseline.GetLength(0)];
                 for (int j = 0; j < baseline.GetLength(0); j++)
                     for (int i = 0; i < baseline.GetLength(1); i++)
-                        calc[baseline.GetLength(1)-1-i, baseline.GetLength(0) - 1 - j] = baseline[j, i];
+                        calc[baseline.GetLength(1)-1-i, j] = baseline[j, i];
                 break;
             default:
                 calc = baseline;

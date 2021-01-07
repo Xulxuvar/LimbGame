@@ -24,6 +24,8 @@ public class PartButton : MonoBehaviour
     public void mousePressed()
     {
         draggingButton = this;
+        GetComponent<Image>().raycastTarget = false;
+        GetComponent<Button>().interactable = false;
         dragging = true;
         dragOffset = new Vector2(transform.position.x,transform.position.y) - new Vector2(Input.mousePosition.x, Input.mousePosition.y);
     }

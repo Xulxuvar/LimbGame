@@ -12,18 +12,19 @@ public class InventoryRender : MonoBehaviour
     private float gridSize = 60;
     private int[] gridDims = { 0, 0 };
 
-    [SerializeField] private Image background;
-    [SerializeField] private Image itemTemplate;
+    [SerializeField] public Image background;
+    [SerializeField] public Image itemTemplate;
 
     public AbstractInventoryState state;
 
+    public bool mouseHeld = false;
 
     //Variables used for state stuffz
     public int[] savedIndex;
     public int[] mouseIndex = { -1, -1 };
     public InventoryPart selected = null;
     public int[] savedOffsetIndex;
-
+    public int savedRot;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +37,7 @@ public class InventoryRender : MonoBehaviour
         resizeBackground(gridDims);
         GenerateEmpties();
         addHeartToGrid(testHeart);
-        addPartToGrid(new TestLimb(), new int[] { 2, 0 });
+        addPartToGrid(new TestLimb3(), new int[] { 2, 0 });
         printInventoryGrid();
 
     }
@@ -56,9 +57,24 @@ public class InventoryRender : MonoBehaviour
       
     }
 
+    public void checkMouseRelease()
+    {
+        if(!Input.GetMouseButton(0))
+        {
+            mouseHeld = false;
+            mouseReleased();
+        }
+    }
+
     public void mousePressed()
     {
         state.mousePress(this);
+        mouseHeld = true;
+    }
+
+    public void mouseEntered()
+    {
+        state.mouseEntered(this);
     }
 
     public void mouseReleased()
@@ -81,12 +97,23 @@ public class InventoryRender : MonoBehaviour
             mouseIndex = newMouse;
             state.highlightedChanged(this);
         }
+
+        if (Input.GetKeyDown("space"))
+        {
+            state.spacebarPressed(this);
+        }
+
+        if (mouseHeld)
+            checkMouseRelease();
+
     }
 
-    public int[] getOriginArray(int[] mouseIndex, int[] savedOffsetIndex, InventoryPart selected)
+    public int[] getOriginArray(int[] mouseIndex, int[] offsetIndex, InventoryPart selected)
     {
+        int[] savedOffsetIndex = new int[] { mouseIndex[0] - offsetIndex[0], mouseIndex[1] - offsetIndex[1] };
         int[] origin;
         int[] partLimits = new int[] { selected.part.getPartGrid().GetLength(0), selected.part.getPartGrid().GetLength(1) };
+      //  Debug.Log("indexes" + mouseIndex[0] + " " + mouseIndex[1] + "\ngridDims " + savedOffsetIndex[0] + " " + savedOffsetIndex[1] + "\npartSize" + partLimits[0] + " " + partLimits[1] + "\n");
         switch (selected.rotation)
         {
             case 1:
@@ -102,6 +129,7 @@ public class InventoryRender : MonoBehaviour
                 origin = new int[] { mouseIndex[0] - savedOffsetIndex[0], mouseIndex[1] - savedOffsetIndex[1] };
                 break;
         }
+     //   Debug.Log(origin[0]+" "+origin[1]+"\n");
         return origin;
     }
 
@@ -112,9 +140,9 @@ public class InventoryRender : MonoBehaviour
         int rowCount = arr.GetLength(0);
         int colCount = arr.GetLength(1);
         string output = "";
-        for (int col = 0; col < colCount; col++)
+        for (int row = 0; row < rowCount; row++)
         {
-            for (int row = 0; row < rowCount; row++)
+            for (int col = 0; col < colCount; col++)
                 output = output + arr[row,col]+" ";
             output = output + "\n";
         }
@@ -135,8 +163,33 @@ public class InventoryRender : MonoBehaviour
     public float[] getCoordsFromIndex(int[] index,InventoryPart part)
     {
         bool[,] partSize = part.part.getPartGrid();
-        float x = marginX + index[0] * gridSize;
-        float y = marginY + (gridDims[1] - partSize.GetLength(0) - index[1]) * gridSize;
+        float x;
+        float y;
+        //index = part.topLeftIndex;
+
+       // Debug.Log("indexes" + index[0] + " " + index[1] + "\ngridDims " + gridDims[0] + " " + gridDims[1] + "\npartSize" + partSize.GetLength(0) + " " + partSize.GetLength(1) + "\n");
+
+        switch(part.rotation)
+        {
+            case 1:
+                x = marginX + index[0] * gridSize;
+                y = marginY + (gridDims[1]  - index[1]) * gridSize;
+                break;
+            case 2:
+                x = marginX + (index[0] + partSize.GetLength(1)) * gridSize;
+                y = marginY + (gridDims[1] - index[1]) * gridSize;
+                break;
+            case 3:
+                x = marginX + (index[0] + partSize.GetLength(0)) * gridSize;
+                y = marginY + (gridDims[1] - partSize.GetLength(1) - index[1]) * gridSize;
+                break;
+
+            default:
+                x = marginX + index[0] * gridSize;
+                y = marginY + (gridDims[1] - partSize.GetLength(0) - index[1]) * gridSize;
+                break;
+    }
+
         return new float[] { x, y };
     }
 
@@ -164,10 +217,18 @@ public class InventoryRender : MonoBehaviour
         emptyScript.setPartSize(partSize.GetLength(0), partSize.GetLength(1));
         empty.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
 
-        inventoryGrid.inventoryList.Add(emptyScript);
-
-        inventoryGrid.addPart(new int[] { i, j },part);
+        inventoryGrid.addPart(new int[] { i, j },emptyScript);
     }
+
+    public void rotatePart(int rot, InventoryPart part, int[] rotationCenter)
+    {
+        part.rotateClockwise() ;
+        int[] cornerOffset = getOriginArray(mouseIndex, savedOffsetIndex, selected);
+        int[] index = new int[] { rotationCenter[0] - cornerOffset[0], rotationCenter[1] - cornerOffset[1] };
+        float[] position = getCoordsFromIndex(index, part);
+        part.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(position[0], position[1]);
+    }
+
 
     private void addPart(int i, int j, InventoryPart iPart)
     {
@@ -184,7 +245,7 @@ public class InventoryRender : MonoBehaviour
 
         inventoryGrid.inventoryList.Add(iPart);
 
-        inventoryGrid.addPart(new int[] { i, j }, iPart.part);
+        inventoryGrid.addPart(new int[] { i, j }, iPart);
     }
 
 

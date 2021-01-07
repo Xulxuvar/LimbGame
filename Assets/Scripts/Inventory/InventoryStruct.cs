@@ -13,9 +13,27 @@ public class InventoryStruct
 
     }
 
+    public void printPartGrid(bool[,] meme)
+    {
+        bool[,] arr = meme;
+        int rowCount = arr.GetLength(0);
+        int colCount = arr.GetLength(1);
+        string output = "";
+        for (int row = 0; row < rowCount; row++)
+        {
+            for (int col = 0; col < colCount; col++)
+                output = output + arr[row, col] + " ";
+            output = output + "\n";
+        }
+        Debug.Log(output);
+    }
+
+
     public bool checkValid(InventoryPart iPart, int[] origin)
     {
         int selectedIndex = -1;
+
+      
 
         for(int i = 0; i<inventoryList.Count; i++)
             if(inventoryList[i] == iPart)
@@ -24,19 +42,19 @@ public class InventoryStruct
                 break;
             }
 
-        bool[,] partShape = iPart.part.getPartGrid();
-
+        bool[,] partShape = iPart.getPartGrid();
+        printPartGrid(partShape);
         for(int i = 0; i<partShape.GetLength(1); i++)
             for(int j = 0; j<partShape.GetLength(0); j++)
             {
-                 if (i + origin[0] > inventoryGrid.GetLength(1) || j + origin[1] > inventoryGrid.GetLength(0) || i + origin[0] < 0 || j + origin[1] < 0)
+                 if (i + origin[0] >= inventoryGrid.GetLength(1) || j + origin[1] >= inventoryGrid.GetLength(0) || i + origin[0] < 0 || j + origin[1] < 0)
                    {
-                     Debug.Log("OOB " + i + origin[0] + " " + j + origin[1] + "\n");
+                    
                          return false;
                    }
                 if (partShape[j, i] && !(inventoryGrid[j + origin[1], i + origin[0]] == -2 || inventoryGrid[j + origin[1], i + origin[0]] == selectedIndex))
                 {
-                    Debug.Log(i + origin[0] + " " + j + origin[1] + "\n");
+                    
                     return false;
                 }
             }
@@ -69,13 +87,14 @@ public class InventoryStruct
     }
     
     //Will need an item reference to run this method later
-    public void addPart(int[] offsets, AbstractPart part)
+    public void addPart(int[] offsets, InventoryPart part)
     {
         //Add a new item here
         //inventoryList.Add();
         //Temporary Appending to the list
-       // inventoryList.Add(0);
-
+        // inventoryList.Add(0);
+        inventoryList.Add(part);
+        part.topLeftIndex = offsets;
         int partIndex = inventoryList.Count - 1;
         bool[,] bools = part.getPartGrid();
         int boundX = bools.GetLength(1);
@@ -85,7 +104,7 @@ public class InventoryStruct
             for(int j = 0; j<boundY; j++)
             {
                 if (bools[j,i])
-                    inventoryGrid[i + offsets[0],j + offsets[1]] = (short)partIndex;
+                    inventoryGrid[j + offsets[1], i + offsets[0]] = (short)partIndex;
             }
         }
     }
@@ -117,13 +136,29 @@ public class InventoryStruct
         }
     }
 
-    public void removeReferences(int index)
+    public void removePart(InventoryPart part)
     {
+        int selectedIndex = -1;
+
+
+
+        for (int i = 0; i < inventoryList.Count; i++)
+            if (inventoryList[i] == part)
+            {
+                selectedIndex = i;
+                break;
+            }
+
+
         for (int i = 0; i < inventoryGrid.GetLength(1); i++)
             for (int j = 0; j < inventoryGrid.GetLength(0); j++)
-                if (inventoryGrid[i, j] == index)
-                    inventoryGrid[i, j] = -1;
-                    
+            {
+                if (inventoryGrid[i, j] == selectedIndex)
+                    inventoryGrid[i, j] = -2;
+                if (inventoryGrid[i, j] > selectedIndex)
+                    inventoryGrid[i, j] -= 1;
+            }
+        inventoryList.Remove(part);     
     }
 
     public short[,] getGrid()

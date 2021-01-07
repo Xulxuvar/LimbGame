@@ -38,6 +38,12 @@ public class AbstractInventoryState : ScriptableObject
 
     }
 
+    //Method that runs with spacebar currently, will have to be scroll wheel later
+    public virtual void spacebarPressed(InventoryRender render)
+    {
+
+    }
+
     //Method runs when the mouse is released in the inventory
     public virtual void mouseRelease(InventoryRender render)
     {

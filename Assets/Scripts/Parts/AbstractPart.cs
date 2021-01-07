@@ -10,6 +10,8 @@ public class AbstractPart : MonoBehaviour
 
         "Sprites/GridSprites/heartpiece",
         "Sprites/GridSprites/ArmLimbThing",
+        "Sprites/GridSprites/FancyLimbBlock",
+        "Sprites/GridSprites/TestLimb3"
     };
 
     public string partName = "AbstractPart";
