@@ -9,13 +9,16 @@ public class PartInventoryList : MonoBehaviour
     private GameObject buttonTemplate;
     [SerializeField]
     private GameObject content;
+
+    public static PartInventoryList defaultInventory;
     // Start is called before the first frame update
     void Start()
     {
         addButton(new TestLimb());
-        addButton(new TestLimb());
-        addButton(new TestLimb());
+        addButton(new TestLimb2());
+        addButton(new TestLimb3());
         addButton(new TestHeart());
+        defaultInventory = this;
     }
 
     // Update is called once per frame

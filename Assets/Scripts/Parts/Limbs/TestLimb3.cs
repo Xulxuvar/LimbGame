@@ -11,7 +11,7 @@ public class TestLimb3 : AbstractLimb
     public TestLimb3()
     : base(3, partGrid)
     {
-        partName = "Test Limb2";
+        partName = "Test Limb3";
         partDescription = "Temp Limb 2 for Debugging Reasons";
     }
 }

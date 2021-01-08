@@ -9,6 +9,7 @@ public class PlayerDragging : AbstractInventoryState
     public override void highlightedChanged(InventoryRender render)
     {
         // int[] origin = new int[] { render.mouseIndex[0] - render.savedOffsetIndex[0], render.mouseIndex[1] - render.savedOffsetIndex[1] };
+        Debug.Log(render.savedOffsetIndex[0] + " " + render.savedOffsetIndex[1]+"\n");
         int[] origin = render.getOriginArray(render.mouseIndex, render.savedOffsetIndex,render.selected);
         int[] positionIndex = new int[] { render.mouseIndex[0] - origin[0], render.mouseIndex[1] - origin[1] };
 
@@ -20,6 +21,7 @@ public class PlayerDragging : AbstractInventoryState
         {
             render.selected.toggleTint(true);
             render.printInventoryGrid();
+            
         }
 
         
@@ -36,7 +38,12 @@ public class PlayerDragging : AbstractInventoryState
     //Method runs when the inventory is exited with the mouse
     public override void mouseExit(InventoryRender render)
     {
-
+        PartInventoryList.defaultInventory.addButton(render.selected.part);
+        render.inventoryGrid.removePart(render.selected);
+        Destroy(render.selected.gameObject);
+        render.selected = null;
+        render.state = new PlayerActiveInventory();
+        
     }
 
     //Method runs when the mouse is pressed in the inventory
@@ -64,6 +71,7 @@ public class PlayerDragging : AbstractInventoryState
             render.inventoryGrid.removePart(render.selected);
             render.inventoryGrid.addPart(positionIndex, render.selected);
             render.printInventoryGrid();
+            render.inventoryGrid.printInventoryList();
         }
         else
         {

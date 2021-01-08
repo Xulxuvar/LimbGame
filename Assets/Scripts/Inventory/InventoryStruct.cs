@@ -13,6 +13,14 @@ public class InventoryStruct
 
     }
 
+    public void printInventoryList()
+    {
+        for(int i = 0; i<inventoryList.Count; i++)
+        {
+            Debug.Log(inventoryList[i].part.partName + "\n");
+        }
+    }
+
     public void printPartGrid(bool[,] meme)
     {
         bool[,] arr = meme;
@@ -148,17 +156,20 @@ public class InventoryStruct
                 selectedIndex = i;
                 break;
             }
+        Debug.Log("Index of the removed Object " + selectedIndex + "\n");
 
-
-        for (int i = 0; i < inventoryGrid.GetLength(1); i++)
-            for (int j = 0; j < inventoryGrid.GetLength(0); j++)
-            {
-                if (inventoryGrid[i, j] == selectedIndex)
-                    inventoryGrid[i, j] = -2;
-                if (inventoryGrid[i, j] > selectedIndex)
-                    inventoryGrid[i, j] -= 1;
-            }
-        inventoryList.Remove(part);     
+        if (selectedIndex != -1)
+        {
+            for (int i = 0; i < inventoryGrid.GetLength(1); i++)
+                for (int j = 0; j < inventoryGrid.GetLength(0); j++)
+                {
+                    if (inventoryGrid[i, j] == selectedIndex)
+                        inventoryGrid[i, j] = -2;
+                    if (inventoryGrid[i, j] > selectedIndex)
+                        inventoryGrid[i, j] -= 1;
+                }
+            inventoryList.Remove(part);
+        }
     }
 
     public short[,] getGrid()

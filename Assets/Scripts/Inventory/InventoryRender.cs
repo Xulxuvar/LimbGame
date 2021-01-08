@@ -74,14 +74,18 @@ public class InventoryRender : MonoBehaviour
 
     public void mouseEntered()
     {
-        state.mouseEntered(this);
+        
+    }
+
+    public void mouseExit()
+    {
+        state.mouseExit(this);
     }
 
     public void mouseReleased()
     {
         state.mouseRelease(this);
     }
-
 
     private void resizeBackground(int[] gridDims)
     {
@@ -105,6 +109,33 @@ public class InventoryRender : MonoBehaviour
 
         if (mouseHeld)
             checkMouseRelease();
+
+    }
+
+    public int[] getSavedIndexWithRot(int[] mouseIndex,InventoryPart selected)
+    {
+
+        int[] partLimits = new int[] { selected.part.getPartGrid().GetLength(1), selected.part.getPartGrid().GetLength(0) };
+        int[] origin;
+
+        switch (selected.rotation)
+        {
+           
+            case 1:
+                origin = new int[] { mouseIndex[1] - selected.topLeftIndex[1], partLimits[1] - 1 - (mouseIndex[0] - selected.topLeftIndex[0]) };
+                break;
+            case 2:
+                origin = new int[] { partLimits[0] - 1 - (mouseIndex[0] - selected.topLeftIndex[0]), partLimits[1] - 1 - (mouseIndex[1] - selected.topLeftIndex[1]) };
+                break;
+            case 3:
+                origin = new int[] { mouseIndex[1] - selected.topLeftIndex[1], partLimits[1] - 1 - (mouseIndex[0] - selected.topLeftIndex[0]) };
+                break;
+            default:
+                origin = new int[] { mouseIndex[0] - selected.topLeftIndex[0], mouseIndex[1] - selected.topLeftIndex[1], };
+                break;
+        }
+
+        return origin;
 
     }
 

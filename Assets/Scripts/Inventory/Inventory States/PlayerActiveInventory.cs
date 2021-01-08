@@ -9,13 +9,7 @@ public class PlayerActiveInventory : AbstractInventoryState
     //Method that runs when the highlighted grid section changes
     public override void highlightedChanged(InventoryRender render)
     {
-
-    }
-
-    //Method runs when the inventory is entered with the mouse, add a method in inventoryRender that creates an inventoryPart and returns it to simplify this section later
-    public override void mouseEntered(InventoryRender render)
-    {
-        if(PartButton.draggingButton)
+        if (PartButton.draggingButton)
         {
             AbstractPart part = PartButton.draggingButton.part;
             Destroy(PartButton.draggingButton.gameObject);
@@ -28,7 +22,7 @@ public class PlayerActiveInventory : AbstractInventoryState
             empty.transform.SetParent(render.background.transform);
             emptyScript.setVisible();
             emptyScript.part = part;
-            emptyScript.topLeftIndex = new int[]{ -1,-1};
+            emptyScript.topLeftIndex = new int[] { -1, -1 };
             emptyScript.setPartSize(partSize.GetLength(0), partSize.GetLength(1));
 
             render.selected = emptyScript;
@@ -38,6 +32,12 @@ public class PlayerActiveInventory : AbstractInventoryState
             render.state = new PlayerDragging();
             render.mouseHeld = true;
         }
+    }
+
+    //Method runs when the inventory is entered with the mouse, add a method in inventoryRender that creates an inventoryPart and returns it to simplify this section later
+    public override void mouseEntered(InventoryRender render)
+    {
+        
     }
     //Method runs when the inventory is exited with the mouse
     public override void mouseExit(InventoryRender render)
@@ -58,7 +58,7 @@ public class PlayerActiveInventory : AbstractInventoryState
                 render.selected = selected;
                 render.savedIndex = debug;
                 render.savedRot = selected.rotation;
-                render.savedOffsetIndex = new int[] { render.savedIndex[0] - render.selected.topLeftIndex[0], render.savedIndex[1] - render.selected.topLeftIndex[1], };
+                render.savedOffsetIndex = render.getSavedIndexWithRot(debug,render.selected);
                 render.state = new PlayerDragging();
             }
         }
